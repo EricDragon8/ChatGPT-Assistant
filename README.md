@@ -2,7 +2,7 @@
 <html>
     <h1>ChatGPT-Assistant</h1>
     <h2>Description</h2>
-    <p>This project uses voice dection in order to send prompts to ChatGPT and convert the response to a mp3 file in order to be played</p>
+    <p>This project uses voice dection in order to send prompts to ChatGPT and convert the response to a .mp3 file in order to be played</p>
     <h2>Installation</h2>
     <ul>
       <li>In order to use this project you will need to install all the libraries included</li>
