@@ -1,5 +1,12 @@
-{
-    "email": "<YOUR_EMAIL>",
-    "password": "YOUR_PASSWORD",
-    "isMicrosoftLogin": true
- }
+[
+    {
+        "email": "<DEFAULT_EMAIL>",
+        "password": "<DEFAULT_PASSWORD>",
+        "isMicrosoftLogin": true
+    },
+    {
+        "email": "<EMAIL2>",
+        "password": "<PASSWORD2>",
+        "isMicrosoftLogin": true
+    }
+]
