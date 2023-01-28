@@ -27,7 +27,7 @@
     <h2>Credits</h2>
     <ul>
       <li>
-       <a href="https://github.com/acheong08">acheong08 and his team</a></li>
+       <a href="https://github.com/acheong08">acheong08 and his team</a> library</li>
     </ul>
   </body>
 </html>
