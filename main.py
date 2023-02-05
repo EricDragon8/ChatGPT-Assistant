@@ -1,6 +1,6 @@
 import speech_recognition as sr
 import soundfile as sf
-import colorama, json, time, pyttsx3
+import json, time, pyttsx3
 from datetime import datetime
 from revChatGPT.ChatGPT import Chatbot
 from colorama import Fore, Back, Style
