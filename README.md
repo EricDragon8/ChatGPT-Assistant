@@ -27,7 +27,7 @@
     <h2>Credits</h2>
     <ul>
       <li>
-       <a href="https://github.com/acheong08">acheong08 and his team</a> library</li>
+       <a href="https://github.com/acheong08">acheong08 and his team</a> for <a href="https://github.com/acheong08/ChatGPT">revChatGPT</a> library</li>
     </ul>
   </body>
 </html>
