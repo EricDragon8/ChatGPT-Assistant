@@ -1,10 +1,10 @@
 import speech_recognition as sr
 import soundfile as sf
-import pygame, colorama, json, os, time, gtts, playsound, subprocess, pyttsx3
+import colorama, json, time, pyttsx3
 from datetime import datetime
 from revChatGPT.ChatGPT import Chatbot
 from colorama import Fore, Back, Style
-import numpy as np
+
 
 
 # COLORS
