@@ -1,9 +1,11 @@
 import speech_recognition as sr
 import soundfile as sf
-import pygame, colorama, json, os, time, gtts, playsound, subprocess
+import pygame, colorama, json, os, time, gtts, playsound, subprocess, pyttsx3
 from datetime import datetime
 from revChatGPT.ChatGPT import Chatbot
 from colorama import Fore, Back, Style
+import numpy as np
+
 
 # COLORS
 CYAN = Fore.LIGHTCYAN_EX
@@ -17,98 +19,80 @@ RESET = Fore.RESET
 
 
 # GENERAL SETTINGS
-__IDIOMA__ = 'es-ES'
-__NOMBRE__ = 'chat'
+__LANGUAGE__ = 'en'
+__NAME__ = 'chat'
 __AUDIO__ = True
-__SPEED__ = 2
 __MULTI_ACCOUNT__ = True
 __CURRENT_ACCOUNT__ = 0
 
 
 
 #FUNCTIONS
-def escucha():
-    """Escucha lo que va diciendo el usuario"""
+def listen():
+    """Listen to the microphone and return the audio as a string"""
     r = sr.Recognizer()
 
     with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source)
-        print(f"{CYAN}[{WHITE}·{CYAN}] {MAGENTA}Escuchando...{RESET}")
+        print(f"{CYAN}[{WHITE}·{CYAN}] {MAGENTA}listening...{RESET}")
         audio = r.listen(source)
 
     try:
         #He comentado la linea de result2 para que no se muestre el texto feo
-        print(f"{GREEN}[{WHITE}·{GREEN}]{MAGENTA} Has dicho: {RESET}" + r.recognize_google(audio, language=__IDIOMA__)) 
-        return r.recognize_google(audio, language=__IDIOMA__)
+        print(f"{GREEN}[{WHITE}·{GREEN}]{MAGENTA} You said: {RESET}" + r.recognize_google(audio, language=__LANGUAGE__)) 
+        return r.recognize_google(audio, language=__LANGUAGE__)
     except sr.UnknownValueError:
         pass
     except sr.RequestError as e:
         pass
 
 
-def log(frase):
-    """Guarda en un archivo la hora y la frase que se ha dicho"""
+def log(sentence):
+    """Save the log"""
     with open('log.txt', 'a', encoding='utf-8') as file:
-        file.write(str(datetime.now()) +': '+ ' '.join(frase) + '\n')
+        file.write(str(datetime.now()) +': '+ ' '.join(sentence) + '\n')
 
 
-def personalizadas(sentencia,):
-    """Frases personalizadas"""
-    if sentencia == '{} hola'.format(__NOMBRE__):
-        voice_process(f'Hola, soy {__NOMBRE__}, tu asistente personal')
+def personalizadas(sentence):
+    """sentences personalizadas"""
+    if sentence == '{} hola'.format(__NAME__):
+        voice_process(f'Hola, soy {__NAME__}, tu asistente personal')
         return True
     
-    if sentencia == '{} vete a dormir'.format(__NOMBRE__):
+    if sentence == '{} vete a dormir'.format(__NAME__):
         voice_process('Voy a dormir')
         return 2
 
-    if sentencia == '{} dime la hora'.format(__NOMBRE__):
+    if sentence == '{} dime la hora'.format(__NAME__):
         voice_process("Son las " + datetime.now().strftime('%H:%M:%S'))
         return True
 
 
-def scale_speed(frase):
-    """Escala la velocidad de la frase"""
-    speed = int(__SPEED__)
-    data, sr = sf.read("temp.mp3")
-    data = data[::speed]
-    sf.write("temp.mp3", data, sr)
+def play_response(sentence):
 
-def play_response():
-    """Reproduce la frase"""
-    pygame.init()
-    pygame.mixer.init()
-    pygame.mixer.music.load("temp.mp3")
-    pygame.mixer.music.play()
-    
-    while pygame.mixer.music.get_busy():
-        pygame.time.Clock().tick(10)
+    engine.say(sentence)
+    engine.runAndWait()
 
 
-def voice_process(frase):
-    """Procesa la frase"""
+
+def voice_process(sentence):
+    """Process the voice"""
     try:
-        if os.path.exists('temp.mp3'):
-            os.remove('temp.mp3')
-            time.sleep(0.5)
+        print(f"{GREEN}[{WHITE}·{GREEN}]{CYAN} Received sentence: {RESET}", sentence)
         
-        print(f"{GREEN}[{WHITE}·{GREEN}]{CYAN} Ha llegado la frase: {RESET}", frase)
-        tts = gtts.gTTS(frase, lang=__IDIOMA__).save('temp.mp3')
-        time.sleep(2)
-
         if __AUDIO__:
-            if __SPEED__ != 1: scale_speed(frase)
-            play_response()   
+            play_response(sentence)
+            time.sleep(2) 
     
     except:
-        print(f"{RED}[{WHITE}·{RED}] {DARKRED}Ha ocurrido un error al reproducir la frase{RESET}")
+        print(f"{RED}[{WHITE}·{RED}] {DARKRED}An error ocurred during reproduction{RESET}")
 
 
-def send_to(frase):
-    """Envia la frase a la api de chat gpt"""""
+def send_to(sentence):
+    """Send the sentence to the api and process the response"""""
     try:
-        response = chatbot.ask(' '.join(frase))
-        log(frase)
+        response = chatbot.ask(' '.join(sentence))
+        log(sentence)
         response = response['message']
         response2 = response.split(' ')
         log(response2)
@@ -119,14 +103,14 @@ def send_to(frase):
         
 
 def login():
-    """Inicia sesión en la api de chat gpt"""
+    """Login into chatgpt in order to get the token"""
     global chatbot
     global __CURRENT_ACCOUNT__
     
     try:
         config = json.load(open("config.json"))
         if __MULTI_ACCOUNT__:
-            print (f"{CYAN}[{WHITE}·{CYAN}] {MAGENTA}Iniciando sesión con la cuenta {__CURRENT_ACCOUNT__}{RESET}")
+            print (f"{CYAN}[{WHITE}·{CYAN}] {MAGENTA}Login in to account: {__CURRENT_ACCOUNT__}{RESET}")
             chatbot = Chatbot(config[__CURRENT_ACCOUNT__], conversation_id=None)
             __CURRENT_ACCOUNT__ = (__CURRENT_ACCOUNT__ + 1) % len(config)
         else:
@@ -134,40 +118,44 @@ def login():
         
         return chatbot
     except:
-        print(f"{RED}[{WHITE}·{RED}] {DARKRED}Ha ocurrido un error al iniciar sesión{RESET}")
+        print(f"{RED}[{WHITE}·{RED}] {DARKRED}An error ocurred while login in{RESET}")
         return False
 
 
 if __name__ == '__main__':
-    """Inicia el programa"""
+    """Runs the main program"""
     
     chatbot = False
     
+    engine = pyttsx3.init("sapi5")
+    voices = engine.getProperty("voices")
+    engine.setProperty("voice", voices[1].id)
+
     while chatbot == False:
         chatbot = login()
         time.sleep(1)
 
     while(True):
         finalizar = False
-        frase = []
-        sentencia = escucha()
+        sentence = []
+        sentence = listen()
         
-        if sentencia != None:
-            frase = sentencia.split(' ')
-            if frase[0].lower() == __NOMBRE__.lower():
-                frase = frase[1:]
-                personalizada = personalizadas(sentencia)
-                print(f"{GREEN}[{WHITE}·{GREEN}] {MAGENTA}Te he entendido{RESET}")
+        if sentence != None:
+            sentence = sentence.split(' ')
+            if sentence[0].lower() == __NAME__.lower():
+                sentence = sentence[1:]
+                personalizada = personalizadas(sentence)
+                print(f"{GREEN}[{WHITE}·{GREEN}] {MAGENTA}I understood you{RESET}")
                 
                 if not personalizada:
-                    send_to(frase)
+                    send_to(sentence)
 
                 if personalizada == 2:
                     finalizar = True
                     break
                     
             else:
-                print(f"{GREEN}[{WHITE}·{GREEN}] {CYAN}Esperando ordenes hacia mi persona...{RESET}")
+                print(f"{GREEN}[{WHITE}·{GREEN}] {CYAN}Waiting for orders...{RESET}")
         
         if finalizar:
             break
