@@ -38,7 +38,7 @@ def listen():
         audio = r.listen(source)
 
     try:
-        #He comentado la linea de result2 para que no se muestre el texto feo
+        #result2 line has been commented to avoid disturbing message
         print(f"{GREEN}[{WHITE}·{GREEN}]{MAGENTA} You said: {RESET}" + r.recognize_google(audio, language=__LANGUAGE__)) 
         return r.recognize_google(audio, language=__LANGUAGE__)
     except sr.UnknownValueError:
@@ -53,8 +53,8 @@ def log(sentence):
         file.write(str(datetime.now()) +': '+ ' '.join(sentence) + '\n')
 
 
-def personalizadas(sentence):
-    """sentences personalizadas"""
+def customs(sentence):
+    """custom sentences"""
     if sentence == '{} hola'.format(__NAME__):
         voice_process(f'Hola, soy {__NAME__}, tu asistente personal')
         return True
@@ -144,7 +144,7 @@ if __name__ == '__main__':
             sentence = sentence.split(' ')
             if sentence[0].lower() == __NAME__.lower():
                 sentence = sentence[1:]
-                personalizada = personalizadas(sentence)
+                personalizada = customs(sentence)
                 print(f"{GREEN}[{WHITE}·{GREEN}] {MAGENTA}I understood you{RESET}")
                 
                 if not personalizada:
