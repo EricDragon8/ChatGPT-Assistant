@@ -7,6 +7,8 @@ from colorama import Fore, Back, Style
 
 
 
+
+
 # COLORS
 CYAN = Fore.LIGHTCYAN_EX
 YELLOW = Fore.LIGHTYELLOW_EX
@@ -18,12 +20,17 @@ DARKRED = Fore.RED
 RESET = Fore.RESET
 
 
+
+
 # GENERAL SETTINGS
 __LANGUAGE__ = 'en'
 __NAME__ = 'chat'
-__AUDIO__ = True
 __MULTI_ACCOUNT__ = True
 __CURRENT_ACCOUNT__ = 0
+__NO_VOICE__ = False
+__AUDIO__ = True
+__WORDS_PER_MINUTE__ = 150
+
 
 
 
@@ -69,10 +76,16 @@ def customs(sentence):
 
 
 def play_response(sentence):
-
+    """Play the response"""
+    engine = pyttsx3.init()
+    engine.setProperty('rate', __WORDS_PER_MINUTE__)
+    voices = engine.getProperty('voices')
+    for voice in voices:
+        if __LANGUAGE__ in voice.name:
+            engine.setProperty('voice', voice.id)
+            break
     engine.say(sentence)
     engine.runAndWait()
-
 
 
 def voice_process(sentence):
@@ -83,7 +96,7 @@ def voice_process(sentence):
         if __AUDIO__:
             play_response(sentence)
             time.sleep(2) 
-    
+            
     except:
         print(f"{RED}[{WHITE}·{RED}] {DARKRED}An error ocurred during reproduction{RESET}")
 
@@ -95,12 +108,73 @@ def send_to(sentence):
         log(sentence)
         response = response['message']
         response2 = response.split(' ')
+        
+        if sentence[0].lower() == 'guarda' or sentence[0].lower() == 'save':
+            code_save(response)
+
         log(response2)
         voice_process(response)
         
     except:
         login()
         
+
+def pickextension(type):
+    """Pick the extension of the file to save the code"""
+    if type == 'json':
+        return '.json'
+    elif type == 'csv':
+        return '.csv'
+    elif type == 'txt':
+        return '.txt'
+    elif type == 'html':
+        return '.html'
+    elif type == 'md':
+        return '.md'
+    elif type == 'python':
+        return '.py'
+    elif type == 'javascript':
+        return '.js'
+    elif type == 'java':
+        return '.java'
+    elif type == 'c':
+        return '.c'
+    elif type == 'c++':
+        return '.cpp'
+    elif type == 'c#':
+        return '.cs'
+    elif type == 'php':
+        return '.php'
+    elif type == 'sql':
+        return '.sql'
+    elif type == 'xml':
+        return '.xml'
+    elif type == 'yaml':
+        return '.yaml'
+    elif type == 'yml':
+        return '.yml'
+    elif type == 'css':
+        return '.css'
+    elif type == 'scss':
+        return '.scss'
+    else :
+        return '.txt'
+    #Add more extensions here
+
+
+def code_save(response):
+    """Save the code in a file"""
+    extension = pickextension(sentence[2].lower())
+    start = response.index("```") + 4
+    end = response.index("```", start)
+    extracted_string = response[start:end]
+
+    filename = "saves/" + str(datetime.now()).replace('-', '').replace(':', '').replace('.', '').replace(' ', '') + extension
+    
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.write(extracted_string)
+        print(f"{GREEN}[{WHITE}·{GREEN}]{CYAN} File saved: {RESET}", filename)
+
 
 def login():
     """Login into chatgpt in order to get the token"""
@@ -138,7 +212,12 @@ if __name__ == '__main__':
     while(True):
         finalizar = False
         sentence = []
-        sentence = listen()
+        
+        if not __NO_VOICE__:
+            sentence = listen()
+
+        else:
+            sentence = input(f"{CYAN}[{WHITE}·{CYAN}]{MAGENTA} Enter a sentence: {RESET}")
         
         if sentence != None:
             sentence = sentence.split(' ')
