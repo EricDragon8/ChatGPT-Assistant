@@ -23,6 +23,8 @@
       <li>Edited some lines from <a href="https://github.com/acheong08/ChatGPT">ChatGPT</a> to make login refresh automatic
         <img src = "https://user-images.githubusercontent.com/98742666/215132410-efd874d8-0ccf-4fce-afe1-e3d833a59ac3.png"></li>
        <li> Fixed some bugs when trying to save the prompt at log.txt</li>
+       <li> Added a more options such as avoid voice inputs and voice speed</li>
+       <li> Added new function in order to save code into a file by sending: <strong>{__NAME__} "guarda" or "save" into {file_type}</strong> a code that....</li>
     </ul>
     <h2>Credits</h2>
     <ul>
